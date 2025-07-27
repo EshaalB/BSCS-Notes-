@@ -40,4 +40,4 @@ class Solution2  {
             return k;
         }
     };
-    
+         
