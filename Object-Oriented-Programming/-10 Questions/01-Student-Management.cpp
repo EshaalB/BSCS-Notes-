@@ -617,6 +617,414 @@ int main() {
 Answer: Box(9)
 */
 
+/*
+==========================================
+PRACTICE DRY RUNS - STUDENT MANAGEMENT
+==========================================
+
+Practice Problem 1: Simple Person Class
+---------------------------------------
+Create a simple Person class with:
+- name (string)
+- age (int)
+- display() method
+- constructor and destructor
+
+Practice Problem 2: Basic Inheritance
+-------------------------------------
+Create a Student class that inherits from Person:
+- Add studentId (string)
+- Add major (string)
+- Override display() method
+
+Practice Problem 3: Static Members
+---------------------------------
+Add static counter to track total students created.
+Create static method to get total count.
+
+Practice Problem 4: Operator Overloading
+---------------------------------------
+Overload == operator to compare students by studentId.
+Overload << operator for output.
+
+Practice Problem 5: Exception Handling
+-------------------------------------
+Create custom exception for invalid student data.
+Throw exception when age < 0 or studentId is empty.
+
+Practice Problem 6: Template Function
+------------------------------------
+Create template function to find student by any field.
+Use with different data types.
+
+Practice Problem 7: Friend Function
+----------------------------------
+Create friend function to calculate average age of students.
+Access private members of Student class.
+
+Practice Problem 8: Virtual Functions
+------------------------------------
+Create base class with virtual display().
+Create derived classes with different display implementations.
+
+Practice Problem 9: File Handling
+--------------------------------
+Save student data to file and load from file.
+Handle file exceptions.
+
+Practice Problem 10: Vector Operations
+-------------------------------------
+Store multiple students in vector.
+Implement add, remove, search, and display all operations.
+*/
+
+// ==========================================
+// PRACTICE SOLUTIONS
+// ==========================================
+
+// Practice 1: Simple Person Class
+class SimplePerson {
+private:
+    string name;
+    int age;
+public:
+    SimplePerson(string n, int a) : name(n), age(a) {
+        cout << "Person created: " << name << endl;
+    }
+    ~SimplePerson() {
+        cout << "Person destroyed: " << name << endl;
+    }
+    void display() const {
+        cout << "Name: " << name << ", Age: " << age << endl;
+    }
+};
+
+// Practice 2: Basic Inheritance
+class SimpleStudent : public SimplePerson {
+private:
+    string studentId;
+    string major;
+public:
+    SimpleStudent(string n, int a, string id, string m) 
+        : SimplePerson(n, a), studentId(id), major(m) {}
+    
+    void display() const override {
+        cout << "Student - Name: " << getName() << ", ID: " << studentId 
+             << ", Major: " << major << endl;
+    }
+    
+    string getName() const { return name; } // This would need to be protected in base
+};
+
+// Practice 3: Static Members
+class StudentCounter {
+private:
+    string name;
+    static int totalStudents;
+public:
+    StudentCounter(string n) : name(n) {
+        totalStudents++;
+    }
+    ~StudentCounter() {
+        totalStudents--;
+    }
+    static int getTotal() { return totalStudents; }
+};
+int StudentCounter::totalStudents = 0;
+
+// Practice 4: Operator Overloading
+class StudentOp {
+private:
+    string studentId;
+    string name;
+public:
+    StudentOp(string id, string n) : studentId(id), name(n) {}
+    
+    bool operator==(const StudentOp& other) const {
+        return studentId == other.studentId;
+    }
+    
+    friend ostream& operator<<(ostream& os, const StudentOp& s) {
+        os << "Student[" << s.studentId << ": " << s.name << "]";
+        return os;
+    }
+    
+    string getId() const { return studentId; }
+    string getName() const { return name; }
+};
+
+// Practice 5: Exception Handling
+class StudentException : public exception {
+private:
+    string message;
+public:
+    StudentException(string msg) : message(msg) {}
+    const char* what() const noexcept override { return message.c_str(); }
+};
+
+class StudentValid {
+private:
+    string studentId;
+    int age;
+public:
+    StudentValid(string id, int a) {
+        if (a < 0) throw StudentException("Age cannot be negative");
+        if (id.empty()) throw StudentException("Student ID cannot be empty");
+        studentId = id;
+        age = a;
+    }
+};
+
+// Practice 6: Template Function
+template<typename T>
+T* findStudent(vector<T*>& students, string field, string value) {
+    for (auto student : students) {
+        if (student->getId() == value || student->getName() == value) {
+            return student;
+        }
+    }
+    return nullptr;
+}
+
+// Practice 7: Friend Function
+class StudentFriend {
+private:
+    string name;
+    int age;
+    static vector<StudentFriend*> allStudents;
+public:
+    StudentFriend(string n, int a) : name(n), age(a) {
+        allStudents.push_back(this);
+    }
+    
+    friend double calculateAverageAge() {
+        if (allStudents.empty()) return 0.0;
+        int total = 0;
+        for (auto student : allStudents) {
+            total += student->age;
+        }
+        return static_cast<double>(total) / allStudents.size();
+    }
+    
+    string getName() const { return name; }
+    int getAge() const { return age; }
+};
+vector<StudentFriend*> StudentFriend::allStudents;
+
+// Practice 8: Virtual Functions
+class VirtualPerson {
+protected:
+    string name;
+public:
+    VirtualPerson(string n) : name(n) {}
+    virtual void display() const {
+        cout << "Person: " << name << endl;
+    }
+    virtual ~VirtualPerson() {}
+};
+
+class VirtualStudent : public VirtualPerson {
+private:
+    string major;
+public:
+    VirtualStudent(string n, string m) : VirtualPerson(n), major(m) {}
+    void display() const override {
+        cout << "Student: " << name << " (Major: " << major << ")" << endl;
+    }
+};
+
+class VirtualTeacher : public VirtualPerson {
+private:
+    string department;
+public:
+    VirtualTeacher(string n, string d) : VirtualPerson(n), department(d) {}
+    void display() const override {
+        cout << "Teacher: " << name << " (Dept: " << department << ")" << endl;
+    }
+};
+
+// Practice 9: File Handling
+class FileStudent {
+private:
+    string name;
+    string studentId;
+public:
+    FileStudent(string n, string id) : name(n), studentId(id) {}
+    
+    void saveToFile(ofstream& file) {
+        file << name << "," << studentId << endl;
+    }
+    
+    static FileStudent* loadFromFile(ifstream& file) {
+        string line;
+        if (getline(file, line)) {
+            size_t pos = line.find(',');
+            if (pos != string::npos) {
+                string name = line.substr(0, pos);
+                string id = line.substr(pos + 1);
+                return new FileStudent(name, id);
+            }
+        }
+        return nullptr;
+    }
+    
+    void display() const {
+        cout << "FileStudent: " << name << " (" << studentId << ")" << endl;
+    }
+};
+
+// Practice 10: Vector Operations
+class VectorStudent {
+private:
+    string name;
+    string studentId;
+public:
+    VectorStudent(string n, string id) : name(n), studentId(id) {}
+    
+    string getName() const { return name; }
+    string getId() const { return studentId; }
+    
+    void display() const {
+        cout << "VectorStudent: " << name << " (" << studentId << ")" << endl;
+    }
+};
+
+class StudentManager {
+private:
+    vector<VectorStudent*> students;
+public:
+    void addStudent(VectorStudent* student) {
+        students.push_back(student);
+    }
+    
+    void removeStudent(string studentId) {
+        for (auto it = students.begin(); it != students.end(); ++it) {
+            if ((*it)->getId() == studentId) {
+                delete *it;
+                students.erase(it);
+                break;
+            }
+        }
+    }
+    
+    VectorStudent* findStudent(string studentId) {
+        for (auto student : students) {
+            if (student->getId() == studentId) {
+                return student;
+            }
+        }
+        return nullptr;
+    }
+    
+    void displayAll() {
+        for (auto student : students) {
+            student->display();
+        }
+    }
+    
+    ~StudentManager() {
+        for (auto student : students) {
+            delete student;
+        }
+    }
+};
+
+// ==========================================
+// PRACTICE DEMONSTRATION
+// ==========================================
+
+void demonstratePracticeProblems() {
+    cout << "\n=== PRACTICE PROBLEMS DEMONSTRATION ===\n";
+    
+    // Practice 1: Simple Person
+    cout << "\n1. Simple Person Class:";
+    SimplePerson p1("Alice", 20);
+    p1.display();
+    
+    // Practice 2: Basic Inheritance
+    cout << "\n2. Basic Inheritance:";
+    SimpleStudent s1("Bob", 19, "S001", "Computer Science");
+    s1.display();
+    
+    // Practice 3: Static Members
+    cout << "\n3. Static Members:";
+    StudentCounter sc1("Charlie");
+    StudentCounter sc2("David");
+    cout << "Total students: " << StudentCounter::getTotal() << endl;
+    
+    // Practice 4: Operator Overloading
+    cout << "\n4. Operator Overloading:";
+    StudentOp so1("S001", "Eve");
+    StudentOp so2("S001", "Frank");
+    StudentOp so3("S002", "Grace");
+    cout << "so1: " << so1 << endl;
+    cout << "so1 == so2: " << (so1 == so2) << endl;
+    cout << "so1 == so3: " << (so1 == so3) << endl;
+    
+    // Practice 5: Exception Handling
+    cout << "\n5. Exception Handling:";
+    try {
+        StudentValid sv1("S001", 20);
+        cout << "Valid student created" << endl;
+        // StudentValid sv2("", 20); // This would throw exception
+    } catch (const StudentException& e) {
+        cout << "Exception: " << e.what() << endl;
+    }
+    
+    // Practice 6: Template Function
+    cout << "\n6. Template Function:";
+    vector<StudentOp*> students = {new StudentOp("S001", "Alice"), new StudentOp("S002", "Bob")};
+    StudentOp* found = findStudent(students, "name", "Alice");
+    if (found) cout << "Found: " << *found << endl;
+    
+    // Practice 7: Friend Function
+    cout << "\n7. Friend Function:";
+    StudentFriend sf1("Alice", 20);
+    StudentFriend sf2("Bob", 22);
+    cout << "Average age: " << calculateAverageAge() << endl;
+    
+    // Practice 8: Virtual Functions
+    cout << "\n8. Virtual Functions:";
+    VirtualPerson* vp1 = new VirtualStudent("Charlie", "Math");
+    VirtualPerson* vp2 = new VirtualTeacher("David", "Physics");
+    vp1->display();
+    vp2->display();
+    delete vp1;
+    delete vp2;
+    
+    // Practice 9: File Handling
+    cout << "\n9. File Handling:";
+    ofstream outFile("practice_students.txt");
+    FileStudent fs1("Eve", "S001");
+    FileStudent fs2("Frank", "S002");
+    fs1.saveToFile(outFile);
+    fs2.saveToFile(outFile);
+    outFile.close();
+    
+    ifstream inFile("practice_students.txt");
+    FileStudent* loaded1 = FileStudent::loadFromFile(inFile);
+    FileStudent* loaded2 = FileStudent::loadFromFile(inFile);
+    if (loaded1) loaded1->display();
+    if (loaded2) loaded2->display();
+    inFile.close();
+    delete loaded1;
+    delete loaded2;
+    
+    // Practice 10: Vector Operations
+    cout << "\n10. Vector Operations:";
+    StudentManager manager;
+    manager.addStudent(new VectorStudent("Grace", "S001"));
+    manager.addStudent(new VectorStudent("Henry", "S002"));
+    manager.displayAll();
+    VectorStudent* found_student = manager.findStudent("S001");
+    if (found_student) found_student->display();
+    
+    // Cleanup
+    for (auto student : students) {
+        delete student;
+    }
+}
+
 int main() {
     demonstrateStudentManagement();
     return 0;
