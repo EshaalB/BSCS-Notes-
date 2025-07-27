@@ -100,6 +100,23 @@ public:
         
         return {}; // No solution found
     }
+
+    // Approach 4 : My own Logic 
+    vector<int> twoSum(vector<int>& nums, int target) {
+        vector<int> temp ;
+        int size = nums.size();
+        for (int i =0; i<size;i++)
+         {
+            for (int j =i+1 ; j<size;j++)
+            {
+                if (nums[i]+nums[j]==target){
+                   temp.push_back(i);
+                     temp.push_back(j);
+                }
+            }
+         }
+         return temp;
+    }
 };
 
 // Helper function to print vector
@@ -138,7 +155,7 @@ int main() {
         vector<int> result1 = solution.twoSum_BruteForce(testNums[i], testTargets[i]);
         vector<int> result2 = solution.twoSum_HashMap(testNums[i], testTargets[i]);
         vector<int> result3 = solution.twoSum_TwoPointers(testNums[i], testTargets[i]);
-        
+        vector<int> result4 = solution.twoSum(testNums[i], testTargets[i]);
         cout << "Brute Force Result: ";
         printVector(result1);
         cout << endl;

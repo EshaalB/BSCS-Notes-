@@ -60,23 +60,18 @@ public:
     // Time Complexity: O(log n)
     // Space Complexity: O(1)
     bool isPalindrome_Math(int x) {
-        // Negative numbers are not palindromes
-        if (x < 0) return false;
-        
-        // Single digit numbers are palindromes
-        if (x < 10) return true;
-        
-        // Reverse the entire number
-        int original = x;
-        int reversed = 0;
-        
-        while (x != 0) {
-            int digit = x % 10;
-            reversed = reversed * 10 + digit;
-            x /= 10;
+        if(x==0) {return true;}
+        if (x<0){ return false;}
+        int original =x ;
+      int rev =0; 
+  while(x!=0)
+        {  
+        int remain = x%10; 
+        if (rev > INT_MAX / 10 || (rev == INT_MAX / 10 && remain > 7)) return false;
+        rev =  10 * rev +remain ;
+        x/=10;
         }
-        
-        return original == reversed;
+      return original==rev; 
     }
     
     // Approach 3: Half Reversal (Optimal)
